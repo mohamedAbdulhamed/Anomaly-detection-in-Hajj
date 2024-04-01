@@ -1,0 +1,18 @@
+h1 span {
+    color: #666;
+}
+
+h1 span.code {
+    font-size: 60px;
+    margin-right: 10px;
+}
+
+h1 span.message {
+    font-size: 24px;
+}
+
+p {
+    font-size: 24px;
+    color: #666;
+    margin-bottom: 20px;
+}

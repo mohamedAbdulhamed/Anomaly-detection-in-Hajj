@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
+{% endblock styles %}
+{% block content %}
+    <h3 class="text-center">Image Classification</h3>
+    <form action="/predict" method="post" enctype="multipart/form-data" class="d-flex flex-column align-items-center">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4 text-center">Upload image to be predicted</legend>
+            <div class="form-group">
+                {{ form.uploadedImage.label(class="form-control-label") }}
+                {% if form.uploadedImage.errors %}
+                    {{ form.uploadedImage(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.uploadedImage.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.uploadedImage(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+        </fieldset>
+
+        <div class="form-group m-3">
+            {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+    </form>
+{% endblock content %}
+{% block scripts %}
+    <!-- Handling form submission / Loader -->
+    <script>
+        var loaders = document.querySelectorAll(".loader")
+        
+        // hide all loaders.
+        loaders.forEach(loader => {
+            loader.style.display = "none";
+        });
+
+        // over flow auto.
+        document.body.style.overflow = "auto";
+
+        // choose a random loader.
+        var loader = loaders[Math.floor(Math.random() * loaders.length)];        
+        
+        var submitBtn = document.getElementById("submit");        
+        
+        submitBtn.addEventListener("click", function() {
+            // validate that the file input is not empty.
+            if (document.getElementById("uploadedImage").value) {
+                // Show the loader.
+                loader.style.display = "flex";
+                
+                // over flow hidden.
+                document.body.style.overflow = "hidden";
+
+                // Prevent the form from submitting multiple times.
+                submitBtn.removeEventListener("click", this);
+            }
+        });
+    </script>
+    <!-- Notification system -->
+    <script>
+        // Notification
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!Notification) {
+                alert('Desktop notifications not available in your browser.');
+                return;
+            }
+
+            if (Notification.permission !== 'granted')
+                Notification.requestPermission();
+        });
+    </script>
+{% endblock scripts %}
