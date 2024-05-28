@@ -1,0 +1,154 @@
+{% extends "layout.html" %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/predict.css') }}">
+{% endblock styles %}
+
+{% block content %}
+    <h2 class="text-center mt-4">Image Classification Result (Label: confidence)</h2>
+    <div class="row w-100 flex-row-reverse">
+        <!-- Results Section -->
+        <div class="col-md-4">
+            <div class="table-container">
+                <div class="text-muted">
+                    Predicted Result: 
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Label</th>
+                            <th>Predicted Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for label, prediction in data %}
+                        <tr>
+                            <td>{{ label }}</td>                        
+                            <td>
+                                {% if prediction == 1.0 %} 
+                                    <span style="color: green;">
+                                        True
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16">
+                                            <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
+                                        </svg>
+                                    </span> 
+                                {% else %} 
+                                    <span style="color: red;">
+                                        False
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                        </svg>
+                                    </span> 
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <span class="text-muted small"><span style="color: red;">*</span> Uses a different model/may have different results</span>
+            </div>
+        </div>
+
+        <!-- Uploaded Image Section -->
+        <div class="col-md-4">
+            <div class="img-container">
+                <img src="{{ url_for('static', filename='images/localized/' + image_name) }}" alt="Uploaded Image">
+            </div>
+        </div>
+    </div>
+
+    <div class="row w-100 flex-row-reverse">
+        <!-- TODO -->
+        <!-- some info about how this works -->
+    </div>
+
+    <div class="row w-100 flex-row-reverse">
+
+        <!-- Save result form -->
+        <div class="col-md-8">
+            <form action="/record/new" method="POST" class="d-flex flex-column align-items-center">
+                <legend class="border-bottom mb-4 text-center">Save results</legend>
+                <input type="hidden" name="image_name" value="{{ image_name }}">
+                <input type="hidden" name="predicted" value="{{ predicted }}">
+                <textarea name="notes" id="notes" cols="30" rows="10" placeholder="Add some notes.(Optional)"></textarea>
+                <button id="submit" type="submit" class="btn btn-primary m-3">Save Result</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hidden data -->
+    <div class="hidden" id="data" data-labels="{{ labels }}" data-predicted="{{ predicted }}" ></div>
+
+{% endblock content %}
+
+{% block scripts %}
+
+    <!-- Handling form submission / Loader -->
+    <script>
+        var loaders = document.querySelectorAll(".loader")
+        
+        // hide all loaders.
+        loaders.forEach(loader => {
+            loader.style.display = "none";
+        });
+
+        // over flow auto.
+        document.body.style.overflow = "auto";
+
+        // choose a random loader.
+        var loader = loaders[Math.floor(Math.random() * loaders.length)];
+        
+        
+        var submitBtn = document.getElementById("submit");        
+        
+        submitBtn.addEventListener("click", function() {
+            // Show the loader.
+            loader.style.display = "flex";
+                
+            // over flow hidden.
+            document.body.style.overflow = "hidden";
+
+            // Prevent the form from submitting multiple times.
+            submitBtn.removeEventListener("click", this);
+        });
+    </script>
+    <!-- Notification system -->
+    <script>
+        // Notification
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!Notification) {
+                alert('Desktop notifications not available in your browser.');
+                return;
+            }
+
+            if (Notification.permission !== 'granted')
+                Notification.requestPermission();
+            else
+                notify();
+        });
+
+
+        function notify() {
+            if (Notification.permission !== 'granted')
+                Notification.requestPermission();
+            else {
+                var notification = new Notification('Image Classification Result', {
+                    icon: 'https://scpwiki.github.io/sigma/images/header-logo.svg',
+                    body: 'Your image has been classified successfully.'
+                });
+
+                notification.onclick = function() {
+                    window.focus();
+                    notification.close();
+                };
+
+                notification.onerror = function() {
+                    console.error("Notification error");
+                };
+
+                setTimeout(notification.close.bind(notification), 7000);
+            }
+        }
+    </script>
+
+{% endblock scripts %}

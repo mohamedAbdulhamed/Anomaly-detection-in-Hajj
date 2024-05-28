@@ -1,0 +1,103 @@
+{% extends "layout.html" %}
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
+{% endblock styles %}
+{% block content %}
+    <h3 class="text-center">Image Classification</h3>
+    <form action="" method="post" enctype="multipart/form-data" class="d-flex flex-column align-items-center">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4 text-center">Upload image to be predicted</legend>
+            <div class="form-group">
+                {% if form.uploadedImage.errors %}
+                {{ form.uploadedImage(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.uploadedImage.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    <div>
+                        <label for="confidence" class="w-100 text-center">
+                            Confidence Value: <span id="confidenceValue">{{ form.confidence.data }}</span>
+                            
+                            <div class="info-icon-container">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                                </svg>
+                                <div class="info-tooltip">
+                                    The confidence value represents the model's certainty about the detected object in the image. Adjust the slider to change the minimum confidence threshold for object detection.
+                                </div>
+                            </div>
+                        </label>
+                        <br>
+                        <input type="range" id="confidence" name="confidence" min="0.50" max="0.99" step="0.01" value="{{ form.confidence.data }}" class="w-100">
+                    </div>
+                    <div>
+                        {{ form.uploadedImage.label(class="form-control-label") }}<br>
+                        {{ form.uploadedImage(class="form-control form-control-lg") }}
+                    </div>
+                {% endif %}
+            </div>
+        </fieldset>
+
+        <div class="form-group m-3">
+            {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+    </form>
+{% endblock content %}
+{% block scripts %}
+    <!-- Handling form submission / Loader -->
+    <script>
+        var loaders = document.querySelectorAll(".loader")
+        
+        // hide all loaders.
+        loaders.forEach(loader => {
+            loader.style.display = "none";
+        });
+
+        // over flow auto.
+        document.body.style.overflow = "auto";
+
+        // choose a random loader.
+        var loader = loaders[Math.floor(Math.random() * loaders.length)];        
+        
+        var submitBtn = document.getElementById("submit");        
+        
+        submitBtn.addEventListener("click", function() {
+            // validate that the file input is not empty.
+            if (document.getElementById("uploadedImage").value) {
+                // Show the loader.
+                loader.style.display = "flex";
+                
+                // over flow hidden.
+                document.body.style.overflow = "hidden";
+
+                // Prevent the form from submitting multiple times.
+                submitBtn.removeEventListener("click", this);
+            }
+        });
+    </script>
+    <!-- Notification system -->
+    <script>
+        // Notification
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!Notification) {
+                alert('Desktop notifications not available in your browser.');
+                return;
+            }
+
+            if (Notification.permission !== 'granted')
+                Notification.requestPermission();
+        });
+    </script>
+    <script>
+        // Confidence slider
+        const confidenceSlider = document.getElementById('confidence');
+        const sliderValue = document.getElementById('confidenceValue');
+
+        confidenceSlider.oninput = function() {
+            sliderValue.textContent = this.value;
+        };
+    </script>
+{% endblock scripts %}

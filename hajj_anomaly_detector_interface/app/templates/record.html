@@ -1,0 +1,127 @@
+{% extends "layout.html" %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/predict.css') }}">
+{% endblock styles %}
+
+{% block content %}
+    <h2 class="text-center mt-4">Image Classification Result</h2>
+    <div class="row w-100 flex-row-reverse">
+        <!-- Results Section -->
+        <div class="col-md-4">
+            <div class="table-container">
+                <p class="text-muted">Predicted Result:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Label</th>
+                            <th>Predicted Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for label, prediction in data %}
+                        <tr>
+                            <td>{{ label }}</td>                        
+                            <td>
+                                {% if prediction == 1.0 %} 
+                                    <span style="color: green;">
+                                        True
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16">
+                                            <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
+                                        </svg>
+                                    </span> 
+                                {% else %} 
+                                    <span style="color: red;">
+                                        False
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                        </svg>
+                                    </span> 
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Uploaded Image Section -->
+        <div class="col-md-4">
+            <div class="img-container">
+                <img src="{{ url_for('static', filename='images/localized/' + record.image_name) }}" alt="Uploaded Image">
+            </div>
+        </div>
+    </div>
+
+    <!-- Update notes form -->
+    <div class="row w-100 flex-row-reverse">
+        <form method="post" class="d-flex flex-column align-items-center col-md-8">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group w-100">
+                <legend class="border-bottom mb-4">Update notes</legend>
+                <!-- notes -->
+                <div class="form-group">
+                    {{ form.notes.label(class="form-control-label") }}
+    
+                    {% if form.notes.errors %}
+                        {{ form.notes(class="form-control form-control-lg is-invalid", id="notes") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.notes.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.notes(class="form-control form-control-lg") }}
+                    {% endif %}    
+                </div>
+            </fieldset>
+            <div class="form-group m-3">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
+
+    <!-- Hidden data -->
+    <div class="hidden" id="data" data-labels="{{ labels }}" data-predicted="{{ predicted }}" ></div>
+
+{% endblock content %}
+
+{% block scripts %}
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Sample data for the anomalies rate chart -->
+    <script>
+        // Sample data for the anomalies rate chart
+        var labels = document.getElementById('data').getAttribute('data-labels');
+        var predictions = document.getElementById('data').getAttribute('data-predicted');
+
+        // Convert the string to an array
+        labels = labels.split(',');
+        predictions = predictions.split(',').map(Number);
+
+        var ctx = document.getElementById('anomaliesChart').getContext('2d');
+        var anomaliesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Anomalies Rate',
+                    data: predictions,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
+{% endblock scripts %}

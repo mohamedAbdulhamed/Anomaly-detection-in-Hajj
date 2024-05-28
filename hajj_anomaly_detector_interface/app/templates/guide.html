@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/guide.css') }}">
+
+{% endblock styles %}
+
+{% block content %}
+    <!-- documentation and video -->
+    <div class="row w-100 flex-row-reverse mt-4">
+        <div class="col-md-8">
+            <div class="guide-container">
+                <h2 class="text-center">User Guide</h2>
+                <p class="text-muted">Welcome to the User Guide section. Here you will find a detailed guide on how to use the application.</p>
+                <p class="text-muted">The application is designed to help users classify images using a pre-trained model. The model is trained to classify images into two categories: True and False. The model is trained on a dataset of images that are labeled as True or False. The model is then used to classify new images uploaded by the user.</p>
+                <p class="text-muted">The application provides the user with the ability to upload an image and view the classification result. The classification result is displayed as a table showing the label and the predicted value. The predicted value is either True or False. The application also displays the uploaded image for the user to view.</p>
+                <p class="text-muted">The application also provides the user with a chart showing the anomalies rate. The anomalies rate is calculated based on the classification result of the uploaded image. The chart shows the anomalies rate over time.</p>
+                <p class="text-muted">To use the application, the user needs to upload an image by clicking on the "Upload Image" button. The user can then view the classification result and the uploaded image. The user can also view the anomalies rate chart.</p>
+                <p class="text-muted">The application is designed to be user-friendly and easy to use. The user guide provides detailed instructions on how to use the application. The user guide also provides tips and tricks on how to get the best results from the application.</p>
+                <p class="text-muted">We hope you find the application useful and enjoy using it. If you have any questions or feedback, please feel free to contact us. We are always happy to help.</p>
+                <p class="text-muted">Thank you for using the application. We appreciate your support and feedback.</p>
+
+                <h2 class="text-center">Video Tutorial</h2>
+                <div class="video-container">
+                    <video ></video>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block scripts %}
+
+{% endblock scripts %}
